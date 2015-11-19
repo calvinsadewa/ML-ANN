@@ -21,9 +21,12 @@ public class main {
         ml.momentumRate = 0.2;
         ml.regularizationRate = 0.4;
         WeightAssignmentStrategy ws = new RandomWeightAssignment();
+        // tambah hidden layer
         ml.layers.add(new CrossEntrophySigmoidLayer(10,10,ws));
         mlc.ml = ml;
         wa.classifier = new NominalMLPClassifier(mlc);
+
+        // input layer dan output layer di generate otomatis
         wa.classifier.buildClassifier(wa.data);
         double[] hasil = wa.test(wa.data);
         System.out.println(wa.evaluation.toSummaryString());
