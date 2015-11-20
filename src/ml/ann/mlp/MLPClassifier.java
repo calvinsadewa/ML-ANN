@@ -2,6 +2,7 @@ package ml.ann.mlp;
 
 import com.sun.org.apache.xpath.internal.operations.Mult;
 import ml.ann.mlp.activation.ReLUActivation;
+import ml.ann.mlp.activation.SigmoidActivation;
 import ml.ann.mlp.util.DeepCopy;
 import ml.ann.mlp.weight.RandomWeightAssignment;
 import ml.ann.mlp.weight.WeightAssignmentStrategy;
@@ -18,10 +19,12 @@ import java.util.Arrays;
  * Class for MLP classifier, where all input is numeric and the class can be nominal or numeric
  */
 public class MLPClassifier extends AbstractClassifier implements Serializable{
-    private MultiLayer ml = new MultiLayer();
+    public MultiLayer ml = new MultiLayer();
     public MultiLayer baseMl = new MultiLayer();
     public WeightAssignmentStrategy ws = new RandomWeightAssignment();
     public boolean m_Nominal = true;
+    public boolean use_SigmoidOutput = false;
+    public boolean use_CrossEnthropyCost = false;
 
     @Override
     public void buildClassifier(Instances data) throws Exception {
@@ -118,7 +121,13 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
 
     // Call this last
     private void addOutputLayer(int numOuput) {
-        if (m_Nominal) {
+        if (use_SigmoidOutput) {
+            if (use_CrossEnthropyCost)
+                ml.layers.add(new CrossEntrophySigmoidLayer(ml.getLastLayer().getNumOutput(),numOuput,ws));
+            else
+                ml.layers.add(new CustomActivationQuadraticCostLayer(ml.getLastLayer().getNumOutput(),numOuput, new SigmoidActivation(),ws));
+        }
+        else if (m_Nominal) {
             ml.layers.add(new SoftmaxLayer(ml.getLastLayer().getNumOutput(),numOuput,ws));
         }
         else {
