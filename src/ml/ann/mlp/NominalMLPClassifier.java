@@ -7,10 +7,12 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.supervised.attribute.NominalToBinary;
 
+import java.io.Serializable;
+
 /**
  * Created by calvin-pc on 11/19/2015.
  */
-public class NominalMLPClassifier implements Classifier {
+public class NominalMLPClassifier implements Classifier,Serializable {
 
     FilteredClassifier m_root = null;
 

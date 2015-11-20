@@ -1,6 +1,8 @@
 package ml.ann.mlp;
 
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import ml.ann.mlp.activation.ReLUActivation;
+import ml.ann.mlp.util.DeepCopy;
 import ml.ann.mlp.weight.RandomWeightAssignment;
 import ml.ann.mlp.weight.WeightAssignmentStrategy;
 import weka.classifiers.AbstractClassifier;
@@ -8,19 +10,22 @@ import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * Created by calvin-pc on 11/19/2015.
  * Class for MLP classifier, where all input is numeric and the class can be nominal or numeric
  */
-public class MLPClassifier extends AbstractClassifier{
-    public MultiLayer ml = new MultiLayer();
+public class MLPClassifier extends AbstractClassifier implements Serializable{
+    private MultiLayer ml = new MultiLayer();
+    public MultiLayer baseMl = new MultiLayer();
     public WeightAssignmentStrategy ws = new RandomWeightAssignment();
     public boolean m_Nominal = true;
 
     @Override
     public void buildClassifier(Instances data) throws Exception {
+        ml = (MultiLayer)DeepCopy.copy(baseMl);
         Instances filtered = new Instances(data);
         filtered.deleteWithMissingClass();
         m_Nominal = data.attribute(data.classIndex()).isNominal();

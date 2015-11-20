@@ -1,12 +1,13 @@
 package ml.ann.mlp;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by calvin-pc on 11/18/2015.
  */
-public class MultiLayer {
+public class MultiLayer implements Serializable{
     public List<RegularizedMomentumLayer> layers = new ArrayList<>();
     public double learningRate = 0.1;
     public double regularizationRate = 0;

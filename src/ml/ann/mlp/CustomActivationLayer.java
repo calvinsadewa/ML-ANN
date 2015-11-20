@@ -142,7 +142,7 @@ public abstract class CustomActivationLayer implements RegularizedMomentumLayer 
         assert(weighted_delta.length == numOutput);
         Double[] derivWeightedInput = derivActivate(weighted_input(input));
         Double[] delta = weighted_delta.clone();
-        for (int j = 0; j < numInput; j++) {
+        for (int j = 0; j < numOutput; j++) {
             delta[j] = delta[j] * derivWeightedInput[j];
         }
         return delta;

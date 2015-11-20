@@ -1,9 +1,11 @@
 package ml.ann.mlp;
 
+import java.io.Serializable;
+
 /**
  * Created by calvin-pc on 11/19/2015.
  */
-public interface RegularizedMomentumLayer {
+public interface RegularizedMomentumLayer extends Serializable{
 
     // Get number of input
     public int getNumInput();
