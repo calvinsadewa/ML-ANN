@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Created by calvin-pc on 11/18/2015.
  */
-public class MultiLayer implements Serializable{
+public class MultiLayer implements Serializable {
     public List<RegularizedMomentumLayer> layers = new ArrayList<>();
     public double learningRate = 0.1;
     public double regularizationRate = 0;
@@ -48,7 +48,7 @@ public class MultiLayer implements Serializable{
             cumulativeBiasUpdateLayer.add(bias);
         }
 
-        for (int i = 0; i<input_data.length; i++) {
+        for (int i = 0; i < input_data.length; i++) {
             //Input by CustomActivationLayer
             List<Double[]> inputLayer = new ArrayList<>();
 
@@ -166,7 +166,7 @@ public class MultiLayer implements Serializable{
         return sum;
     }
 
-    // Implementing Fisher?Yates shuffle
+    // Implementing Fisher-Yates shuffle
     static<T> void shuffleArray(T[] ar, T[] ar2)
     {
         // If running on Java 6 or older, use `new Random()` on RHS here

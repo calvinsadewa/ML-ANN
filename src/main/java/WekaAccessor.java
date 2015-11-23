@@ -7,6 +7,7 @@ import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.supervised.instance.Resample;
 
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Random;
 
 /**
@@ -36,6 +37,14 @@ public class WekaAccessor {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadData(InputStream is) throws Exception {
+        assert(is != null);
+
+        DataSource source = new DataSource(is);
+        data = source.getDataSet();
+        data.setClassIndex(data.numAttributes() - 1);
     }
 
     public void removeAttributeAt(int position) {

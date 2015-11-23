@@ -1,4 +1,4 @@
-package ml.ann.mlp.weight;
+package ml.ann.weight;
 
 /**
  * Created by calvin-pc on 11/19/2015.

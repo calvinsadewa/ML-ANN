@@ -1,12 +1,11 @@
 package ml.ann.mlp;
 
-import ml.ann.mlp.activation.ActivationStrategy;
-import ml.ann.mlp.weight.WeightAssignmentStrategy;
+import ml.ann.weight.WeightAssignmentStrategy;
 
 /**
- * Created by calvin-pc on 11/17/2015.
+ * Created by calvin-pc on 11/19/2015.
  */
-public abstract class CustomActivationLayer implements RegularizedMomentumLayer {
+public class SoftmaxLayer implements RegularizedMomentumLayer {
 
     // Weight matrix
     // use like "weights[no_neuron][input]"
@@ -17,15 +16,13 @@ public abstract class CustomActivationLayer implements RegularizedMomentumLayer 
     public double momentum_rate = 0;
     public int numInput;
     public int numOutput;
-    public ActivationStrategy activationFunction;
 
     public void setMomentum(Double momentum) {momentum_rate = momentum;}
     public double getMomentum() {return momentum_rate;}
 
-    public CustomActivationLayer(int num_input, int num_output, ActivationStrategy activation, WeightAssignmentStrategy ws) {
+    public SoftmaxLayer(int num_input, int num_output, WeightAssignmentStrategy ws) {
         this.numInput = num_input;
         this.numOutput = num_output;
-        this.activationFunction = activation;
         weights = new Double[num_output][];
         momentum = new Double[num_output][];
         bias = new Double[num_output];
@@ -71,17 +68,13 @@ public abstract class CustomActivationLayer implements RegularizedMomentumLayer 
     public Double[] activate(Double[] input) {
         assert(input.length == numInput);
         Double[] ret = new Double[input.length];
+        Double sum = 0.0;
         for (int i = 0; i < input.length; i++) {
-            ret[i] = activationFunction.apply(input[i]);
+            ret[i] = Math.exp(input[i]);
+            sum = sum + ret[i];
         }
-        return ret;
-    }
-
-    public Double[] derivActivate(Double[] input) {
-        assert(input.length == numInput);
-        Double[] ret = new Double[input.length];
         for (int i = 0; i < input.length; i++) {
-            ret[i] = activationFunction.derivation(input[i]);
+            ret[i] = ret[i]/sum;
         }
         return ret;
     }
@@ -140,16 +133,21 @@ public abstract class CustomActivationLayer implements RegularizedMomentumLayer 
     public Double[] calculateDelta(Double[] weighted_delta, Double[] input) {
         assert(input.length == numInput);
         assert(weighted_delta.length == numOutput);
-        Double[] derivWeightedInput = derivActivate(weighted_input(input));
-        Double[] delta = weighted_delta.clone();
-        for (int j = 0; j < numOutput; j++) {
-            delta[j] = delta[j] * derivWeightedInput[j];
-        }
-        return delta;
+        throw new RuntimeException("Softmax Layer should used as output layer");
     }
 
     // Calculate error in output layer if it's last layer
-    abstract public Double[] calculateOutputError(Double[] input, Double[] target);
+    public Double[] calculateOutputError(Double[] input, Double[] target) {
+        // Using Log Likelihood Function
+        assert (input.length == numInput);
+        assert (target.length == numOutput);
+        Double[] output = feedfoward(input);
+        Double[] delta = new Double[numOutput];
+        for (int j = 0; j < output.length; j++) {
+            delta[j] = (output[j] - target[j]);
+        }
+        return delta;
+    }
 
     // Calculate the weighted delta (delta . weights) for next layer delta
     public Double[] calculateWeightedDelta(Double[] delta) {
@@ -166,4 +164,5 @@ public abstract class CustomActivationLayer implements RegularizedMomentumLayer 
         }
         return weighted_delta;
     }
+
 }

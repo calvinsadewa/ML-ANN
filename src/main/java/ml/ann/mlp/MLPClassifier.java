@@ -1,11 +1,10 @@
 package ml.ann.mlp;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import ml.ann.mlp.activation.ReLUActivation;
 import ml.ann.mlp.activation.SigmoidActivation;
-import ml.ann.mlp.util.DeepCopy;
-import ml.ann.mlp.weight.RandomWeightAssignment;
-import ml.ann.mlp.weight.WeightAssignmentStrategy;
+import ml.ann.util.DeepCopy;
+import ml.ann.weight.RandomWeightAssignment;
+import ml.ann.weight.WeightAssignmentStrategy;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Capabilities;
 import weka.core.Instance;
@@ -24,7 +23,7 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
     public WeightAssignmentStrategy ws = new RandomWeightAssignment();
     public boolean m_Nominal = true;
     public boolean use_SigmoidOutput = false;
-    public boolean use_CrossEnthropyCost = false;
+    public boolean use_CrossEntropyCost = false;
 
     @Override
     public void buildClassifier(Instances data) throws Exception {
@@ -54,7 +53,7 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
             for (int i = 0; i<output.length; i++) {
                 if (output[i] > output[max]) max = i;
             }
-            return new Double(max);
+            return (double) max;
         }
         else {
             return output[0];
@@ -67,7 +66,7 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
         Double[] output = ml.feedfoward(input);
         double[] ret = new double[output.length];
         for (int i = 0; i< output.length; i++) {
-            ret[i] = output[i].doubleValue();
+            ret[i] = output[i];
         }
         return ret;
     }
@@ -122,7 +121,7 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
     // Call this last
     private void addOutputLayer(int numOuput) {
         if (use_SigmoidOutput) {
-            if (use_CrossEnthropyCost)
+            if (use_CrossEntropyCost)
                 ml.layers.add(new CrossEntrophySigmoidLayer(ml.getLastLayer().getNumOutput(),numOuput,ws));
             else
                 ml.layers.add(new CustomActivationQuadraticCostLayer(ml.getLastLayer().getNumOutput(),numOuput, new SigmoidActivation(),ws));

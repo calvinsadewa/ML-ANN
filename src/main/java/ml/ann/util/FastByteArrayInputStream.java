@@ -1,10 +1,9 @@
-package ml.ann.mlp.util;
+package ml.ann.util;
 
 /**
  * Created by calvin-pc on 11/20/2015.
  */
 import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * ByteArrayInputStream implementation that does not synchronize methods.

@@ -1,4 +1,4 @@
-package ml.ann.mlp.weight;
+package ml.ann.weight;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

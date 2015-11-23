@@ -1,7 +1,7 @@
 package ml.ann.mlp;
 
 import ml.ann.mlp.activation.SigmoidActivation;
-import ml.ann.mlp.weight.WeightAssignmentStrategy;
+import ml.ann.weight.WeightAssignmentStrategy;
 
 /**
  * Created by calvin-pc on 11/19/2015.
