@@ -72,12 +72,7 @@ public class NNUtils {
     }
 
     public static double[] instanceToInputVector (Instance instance) {
-        double[] ret;
-        if (instance.classIsMissing()) {
-            ret = new double[instance.numAttributes()];
-        } else {
-            ret = new double[instance.numAttributes() - 1];
-        }
+        double[] ret = new double[instance.numAttributes() - 1];
 
         int visitClass = 0;
         for (int i = 0; i < instance.numAttributes(); i++) {

@@ -3,12 +3,17 @@ package ml.ann.single_node;
 import ml.ann.util.DeepCopy;
 import ml.ann.util.NNUtils;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.core.*;
+import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by Alvin Natawiguna on 11/29/2015.
@@ -29,6 +34,10 @@ public class SingleNodeNN extends AbstractClassifier {
 
     protected SingleNodeClassifier classifier;
 
+    protected boolean nominal;
+
+    protected Filter nominalFilter;
+
     @Override
     public void buildClassifier(Instances data) throws Exception {
         // preprocessing: data filtering and cleaning
@@ -39,6 +48,13 @@ public class SingleNodeNN extends AbstractClassifier {
         Filter missingValuesFilter = new ReplaceMissingValues();
         missingValuesFilter.setInputFormat(trainingData);
         trainingData = Filter.useFilter(trainingData, missingValuesFilter);
+
+        nominal = trainingData.classAttribute().isNominal();
+        if (nominal) {
+            nominalFilter = new NominalToBinary();
+            nominalFilter.setInputFormat(trainingData);
+            trainingData = Filter.useFilter(trainingData, nominalFilter);
+        }
 
         // convert to input vectors
         double inputVectors[][] = new double[trainingData.numInstances()][];
@@ -71,10 +87,20 @@ public class SingleNodeNN extends AbstractClassifier {
     }
 
     @Override
-    public double classifyInstance(Instance instance) {
+    public double classifyInstance(Instance instance) throws Exception {
         assert(classifier != null);
 
-        return classifier.classify(NNUtils.instanceToInputVector(instance));
+        Instance toBeClassified;
+        if (nominal) {
+            assert(nominalFilter != null);
+
+            nominalFilter.input(instance);
+            toBeClassified = nominalFilter.output();
+        } else {
+            toBeClassified = (Instance) instance.copy();
+        }
+
+        return classifier.classify(NNUtils.instanceToInputVector(toBeClassified));
     }
 
     @Override
@@ -225,5 +251,37 @@ public class SingleNodeNN extends AbstractClassifier {
 
     public void setBias(double bias) {
         this.bias = bias;
+    }
+
+    public String getClassifierName() {
+        return classifierName;
+    }
+
+    public void setClassifierName(String classifierName) {
+        this.classifierName = classifierName;
+    }
+
+    public static void main(String args[]) throws Exception {
+        InputStream is = SingleNodeNN.class.getClassLoader().getResourceAsStream("weather.nominal.arff");
+        if (is == null) {
+            throw new Exception("Cannot load test data!");
+        }
+
+        ConverterUtils.DataSource data;
+        Instances testData;
+        try {
+            data = new ConverterUtils.DataSource(is);
+            testData = data.getDataSet();
+            testData.setClassIndex(testData.numAttributes() - 1);
+
+            Classifier classifier = new SingleNodeNN();
+            ((SingleNodeNN)classifier).setDebug(true);
+            Evaluation evaluation = new Evaluation(testData);
+
+            evaluation.crossValidateModel(classifier, testData, 10, ThreadLocalRandom.current());
+            System.out.println(evaluation.toSummaryString("Perceptron with nominal value result:", false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

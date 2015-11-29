@@ -89,14 +89,26 @@ public class DeltaRuleBatch extends SingleNodeClassifier {
 
     @Override
     public double classify(double[] inputVector) {
-        assert (weights.length == inputVector.length + 1);
-
         // calculate the bias first
         double outputValue = bias * weights[0];
-        for (int i = 0; i < inputVector.length; i++) {
-            outputValue += inputVector[i] * weights[i + 1];
+        for (int i = 1; i < weights.length; i++) {
+            outputValue += inputVector[i-1] * weights[i];
         }
 
         return outputValue;
+    }
+
+    @Override
+    public double[] distribution(double[] inputVector) {
+        double dist[] = new double[numClasses];
+        double output = classify(inputVector);
+
+        if (numClasses == 1) {
+            dist[0] = output;
+        } else {
+            dist[(int)Math.round(output)] = 1;
+        }
+
+        return dist;
     }
 }

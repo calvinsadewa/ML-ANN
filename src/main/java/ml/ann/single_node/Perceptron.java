@@ -60,15 +60,26 @@ public class Perceptron extends SingleNodeClassifier {
 
     @Override
     public double classify(double[] inputVector) {
-        assert(weights.length == inputVector.length + 1);
-
         // calculate the bias first
         double outputValue = bias * weights[0];
-        for (int i = 0; i < inputVector.length; i++) {
-            outputValue += inputVector[i] * weights[i+1];
+        for (int i = 1; i < weights.length; i++) {
+            outputValue += inputVector[i-1] * weights[i];
         }
 
         // apply sign function
         return outputValue > 0 ? 1 : -1;
+    }
+
+    @Override
+    public double[] distribution(double[] inputVector) {
+        double[] dist = new double[2];
+        double output = this.classify(inputVector);
+        if (output == -1) {
+            dist[0] = 1;
+        } else {
+            dist[1] = 1;
+        }
+
+        return dist;
     }
 }
