@@ -15,6 +15,7 @@ public class MultiLayer implements Serializable{
     public int mini_batch_size = 1;
     public int epochs = 1000;
     public Double minDeltaMSE = 0.0;
+    public Double minMSE = 0.0;
 
     public Double[] feedfoward (Double[] input) {
         Double[] current_input = input.clone();
@@ -125,11 +126,12 @@ public class MultiLayer implements Serializable{
         int current_epoch = 0;
         Double prevMSE = 0.0;
         Double currentDeltaMSE = Double.MAX_VALUE;
+        Double currentMSE = Double.MAX_VALUE;
 
         for (RegularizedMomentumLayer l: layers) {
             l.setMomentum(momentumRate);
         }
-        while (current_epoch < epochs && currentDeltaMSE > minDeltaMSE) {
+        while (current_epoch < epochs && currentDeltaMSE > minDeltaMSE && currentMSE > minMSE) {
             shuffleArray(input_data,target_data);
             for (int i = 0; i< input_data.length / mini_batch_size; i++) {
                 int batch_size = 0;
@@ -141,7 +143,7 @@ public class MultiLayer implements Serializable{
             }
 
             current_epoch ++;
-            Double currentMSE = calculateMSE(input_data,target_data);
+            currentMSE = calculateMSE(input_data,target_data);
             currentDeltaMSE = Math.abs(currentMSE - prevMSE);
             prevMSE = currentMSE;
             System.out.println("MSE = " + prevMSE);

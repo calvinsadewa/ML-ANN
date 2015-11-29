@@ -66,8 +66,15 @@ public class MLPClassifier extends AbstractClassifier implements Serializable{
         Double[] input = instanceToInputVector(instance);
         Double[] output = ml.feedfoward(input);
         double[] ret = new double[output.length];
+        Double sum = 0.0;
         for (int i = 0; i< output.length; i++) {
             ret[i] = output[i].doubleValue();
+            sum += ret[i];
+        }
+
+        if (sum == 0) sum = 1.0;
+        for (int i = 0; i< output.length; i++) {
+            ret[i] /= sum;
         }
         return ret;
     }
