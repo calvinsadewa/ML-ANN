@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 /**
  * Created by calvin-pc on 11/19/2015.
- * Class for MLP classifier, where all input is numeric and the class can be nominal or numeric
+ * Class for MLP classifierName, where all input is numeric and the class can be nominal or numeric
  */
 public class MLPClassifier extends AbstractClassifier implements Serializable{
     public MultiLayer ml = new MultiLayer();

@@ -1,97 +1,131 @@
 package ml.ann.single_node;
 
-import ml.ann.NNUtils;
 import ml.ann.weight.GivenWeightAssignment;
 import ml.ann.weight.RandomWeightAssignment;
 import ml.ann.weight.WeightAssignmentStrategy;
-import weka.classifiers.AbstractClassifier;
-import weka.core.Capabilities;
-import weka.core.Instance;
-import weka.core.Instances;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Created by Alvin Natawiguna on 11/23/2015.
+ * Created by Alvin Natawiguna on 11/29/2015.
  */
-public abstract class SingleNodeClassifier extends AbstractClassifier {
+public abstract class SingleNodeClassifier {
 
-    protected double learningRate;
+    protected double learningRate = 0.1;
 
-    protected Double initialWeights;
+    protected Double initialWeight = null;
 
-    /**
-     * The value of the bias
-     */
+    protected int maxEpoch = 1000;
+
+    protected double minError = 0;
+
     protected double bias = 1.0;
 
+    protected boolean debug = true;
+
+    protected double[] weights;
+
     public SingleNodeClassifier() {
-        initialWeights = null;
-        learningRate = 0.5;
+
     }
 
-    public SingleNodeClassifier(double initialWeights) {
-        this();
-        this.initialWeights = initialWeights;
-    }
-
-    public SingleNodeClassifier(double initialWeights, double bias) {
-        this(initialWeights);
+    public SingleNodeClassifier(double learningRate, Double initialWeight, int maxEpoch, double minError, double bias, boolean debug) {
+        this.learningRate = learningRate;
+        this.initialWeight = initialWeight;
+        this.maxEpoch = maxEpoch;
+        this.minError = minError;
         this.bias = bias;
+        this.debug = debug;
     }
 
-    public SingleNodeClassifier(double initialWeights, double bias, double learningRate) {
-        this(initialWeights, bias);
+    public abstract void buildClassifier(double[][] inputVectors, double[] targetVector);
+
+    /**
+     * Classifies the current instance with the current model.
+     * @param inputVector a vector of attributes
+     * @return the number that represents the class's value
+     */
+    public abstract double classify(double[] inputVector);
+
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }
 
-    public double getInitialWeights() {
-        return initialWeights;
+    public Double getInitialWeight() {
+        return initialWeight;
     }
 
-    public void setInitialWeights(double initialWeights) {
-        this.initialWeights = initialWeights;
+    public void setInitialWeight(Double initialWeight) {
+        this.initialWeight = initialWeight;
     }
 
-    @Override
-    public void buildClassifier(Instances data) throws Exception {
-        double inputVectors[][] = new double[data.size()][];
-        for (int i = 0; i < data.size(); i++) {
-            inputVectors[i] = NNUtils.instanceToInputVector(data.instance(i));
+    public int getMaxEpoch() {
+        return maxEpoch;
+    }
+
+    public void setMaxEpoch(int maxEpoch) {
+        this.maxEpoch = maxEpoch;
+    }
+
+    public double getMinError() {
+        return minError;
+    }
+
+    public void setMinError(double minError) {
+        this.minError = minError;
+    }
+
+    public double getBias() {
+        return bias;
+    }
+
+    public void setBias(double bias) {
+        this.bias = bias;
+    }
+
+    public double[] getWeights() {
+        return weights;
+    }
+
+    /**
+     * Initializes the weights of the neural network
+     * Fills the first 'row' of weights with the initial weight number
+     *
+     * @param attributeCount the number of attributes
+     */
+    protected void initializeWeights(int attributeCount) {
+        WeightAssignmentStrategy strategy;
+        if (initialWeight == null) {
+            strategy = new RandomWeightAssignment();
+        } else {
+            strategy = new GivenWeightAssignment(initialWeight);
         }
 
-        double targetVectors[][] = new double[data.size()][];
-        for (int i = 0; i < data.size(); i++) {
-            targetVectors[i] = NNUtils.instanceToTargetVector(data.instance(i));
+        // initialize all of the class's weights
+        // the zeroth element is the bias
+        weights = new double[attributeCount + 1];
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = strategy.getWeight();
+        }
+    }
+
+    protected double calculateErrorSum(double[][] inputVectors, double[] targetVector) {
+        // 4. calculate final output
+        double errorSum = 0;
+        for (int i = 0; i < inputVectors.length; i++) {
+            double output = classify(inputVectors[i]);
+
+            // calculate error
+            double error = targetVector[i] - output;
+
+            errorSum += Math.pow(error, 2);
         }
 
-        this.classify(inputVectors, targetVectors);
-    }
-
-    protected abstract void classify(double[][] inputVectors, double[][] targetVectors);
-
-    @Override
-    public double classifyInstance(Instance instance) throws Exception {
-        return 0;
-    }
-
-    @Override
-    public double[] distributionForInstance(Instance instance) throws Exception {
-        return new double[0];
-    }
-
-    @Override
-    public Capabilities getCapabilities() {
-        Capabilities result = super.getCapabilities();
-        result.disableAll();
-
-        // attributes
-        result.enable(Capabilities.Capability.NOMINAL_ATTRIBUTES);
-        result.enable(Capabilities.Capability.NUMERIC_ATTRIBUTES);
-
-        // class
-        result.enable(Capabilities.Capability.NOMINAL_CLASS);
-        result.enable(Capabilities.Capability.NUMERIC_CLASS);
-        result.enable(Capabilities.Capability.MISSING_CLASS_VALUES);
-
-        return result;
+        return errorSum;
     }
 }

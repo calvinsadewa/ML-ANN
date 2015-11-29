@@ -35,14 +35,13 @@ public class MultiLayer implements Serializable {
         List<Double[]> cumulativeBiasUpdateLayer = new ArrayList<>();
 
         //Calculate update by backprop
-        for (int i = 0; i< layers.size(); i++) {
-            RegularizedMomentumLayer l = layers.get(i);
+        for (RegularizedMomentumLayer l : layers) {
             Double[] bias = new Double[l.getNumOutput()];
             Double[][] weight_vec = new Double[l.getNumOutput()][];
-            Arrays.fill(bias,0.0);
-            for (int j = 0; j<l.getNumOutput(); j++) {
+            Arrays.fill(bias, 0.0);
+            for (int j = 0; j < l.getNumOutput(); j++) {
                 weight_vec[j] = new Double[l.getNumInput()];
-                Arrays.fill(weight_vec[j],0.0);
+                Arrays.fill(weight_vec[j], 0.0);
             }
             cumulativeWeightUpdateLayer.add(weight_vec);
             cumulativeBiasUpdateLayer.add(bias);

@@ -103,7 +103,7 @@ public class WekaAccessor {
         try {
             classifier.buildClassifier(train);
             /*for (int i = 0; i < test.numInstances(); i++) {
-                double pred = classifier.classifyInstance(test.instance(i));
+                double pred = classifierName.classifyInstance(test.instance(i));
                 System.out.print("ID: " + test.instance(i));
                 System.out.print(", actual: " + test.classAttribute().value((int) test.instance(i).classValue()));
                 System.out.println(", predicted: " + test.classAttribute().value((int) pred));
