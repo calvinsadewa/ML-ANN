@@ -9,6 +9,7 @@ import weka.core.*;
 import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
+import weka.filters.unsupervised.attribute.Normalize;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 
 import java.io.InputStream;
@@ -38,6 +39,8 @@ public class SingleNodeNN extends AbstractClassifier {
 
     protected Filter nominalFilter;
 
+    protected Filter normailzeFilter;
+
     @Override
     public void buildClassifier(Instances data) throws Exception {
         // preprocessing: data filtering and cleaning
@@ -55,6 +58,10 @@ public class SingleNodeNN extends AbstractClassifier {
             nominalFilter.setInputFormat(trainingData);
             trainingData = Filter.useFilter(trainingData, nominalFilter);
         }
+
+        normailzeFilter = new Normalize();
+        normailzeFilter.setInputFormat(trainingData);
+        trainingData = Filter.useFilter(trainingData, normailzeFilter);
 
         // convert to input vectors
         double inputVectors[][] = new double[trainingData.numInstances()][];
@@ -99,6 +106,9 @@ public class SingleNodeNN extends AbstractClassifier {
         } else {
             toBeClassified = (Instance) instance.copy();
         }
+
+        normailzeFilter.input(toBeClassified);
+        toBeClassified = normailzeFilter.output();
 
         return classifier.classify(NNUtils.instanceToInputVector(toBeClassified));
     }
@@ -202,15 +212,7 @@ public class SingleNodeNN extends AbstractClassifier {
         setInitialWeight(initialWeight.isEmpty() ? null : Double.parseDouble(initialWeight));
 
         String classifier = Utils.getOption("Classifier", options).toLowerCase();
-        switch (classifier) {
-            case "perceptron":
-            case "delta-inc":
-            case "delta-batch":
-                this.classifierName = classifier;
-                break;
-            default:
-                throw new Exception("Unknown classifier: " + classifier);
-        }
+        setClassifierName(classifier);
     }
 
     public double getLearningRate() {
@@ -257,8 +259,16 @@ public class SingleNodeNN extends AbstractClassifier {
         return classifierName;
     }
 
-    public void setClassifierName(String classifierName) {
-        this.classifierName = classifierName;
+    public void setClassifierName(String classifierName) throws Exception {
+        switch (classifierName) {
+            case "perceptron":
+            case "delta-inc":
+            case "delta-batch":
+                this.classifierName = classifierName;
+                break;
+            default:
+                throw new Exception("Unknown classifier: " + classifierName);
+        }
     }
 
     public static void main(String args[]) throws Exception {

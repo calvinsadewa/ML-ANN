@@ -78,7 +78,7 @@ public class DeltaRuleBatch extends SingleNodeClassifier {
             currentError = calculateErrorSum(inputVectors, targetVector);
 
             // divide by number of classes defined
-            currentError /= numClasses;
+            currentError *= 0.5;
             currentEpoch++;
 
             if (debug) {
@@ -95,20 +95,14 @@ public class DeltaRuleBatch extends SingleNodeClassifier {
             outputValue += inputVector[i-1] * weights[i];
         }
 
-        return outputValue;
-    }
-
-    @Override
-    public double[] distribution(double[] inputVector) {
-        double dist[] = new double[numClasses];
-        double output = classify(inputVector);
-
-        if (numClasses == 1) {
-            dist[0] = output;
-        } else {
-            dist[(int)Math.round(output)] = 1;
+        // round it
+        long output = Math.round(outputValue);
+        if (output > numClasses - 1) {
+            output = numClasses - 1;
+        } else if (output < 0) {
+            output = 0;
         }
 
-        return dist;
+        return (double) output;
     }
 }

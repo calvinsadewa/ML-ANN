@@ -49,7 +49,7 @@ public class Perceptron extends SingleNodeClassifier {
             currentError = calculateErrorSum(inputVectors, targetVector);
 
             // divide by two, since we have binary classes
-            currentError /= 2;
+            currentError *= 0.5;
             currentEpoch++;
 
             if (debug) {
@@ -67,19 +67,7 @@ public class Perceptron extends SingleNodeClassifier {
         }
 
         // apply sign function
-        return outputValue > 0 ? 1 : -1;
-    }
-
-    @Override
-    public double[] distribution(double[] inputVector) {
-        double[] dist = new double[2];
-        double output = this.classify(inputVector);
-        if (output == -1) {
-            dist[0] = 1;
-        } else {
-            dist[1] = 1;
-        }
-
-        return dist;
+        // we use 0 and 1 here
+        return outputValue > 0 ? 0 : 1;
     }
 }

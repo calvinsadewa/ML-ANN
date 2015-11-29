@@ -48,8 +48,6 @@ public abstract class SingleNodeClassifier {
      */
     public abstract double classify(double[] inputVector);
 
-    public abstract double[] distribution(double[] inputVector);
-
     public double getLearningRate() {
         return learningRate;
     }
